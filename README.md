@@ -28,10 +28,12 @@ docker compose up --build
 ```
 
 - API: http://localhost:8080/health
-- Web: http://localhost:3000
+- Web: http://localhost:3000 (daftar resi: http://localhost:3000/shipments)
 - Postgres: `localhost:5432` (ghaura/ghaura)
 - Redis: `localhost:6379`
-- Kafka (Redpanda): `localhost:19092`
+- Kafka (Redpanda): `localhost:19092` (belum dipakai Sprint 1)
+
+Panduan Sprint 1 (migrasi, cache Redis, contoh curl create customer → create shipment → get by resi): [docs/sprint-1.md](docs/sprint-1.md)
 
 ## MVP roadmap
 
