@@ -1,4 +1,4 @@
-.PHONY: up down infra api logs
+.PHONY: up down infra api logs test-api
 
 up:
 	docker compose up --build
@@ -14,3 +14,6 @@ api:
 
 logs:
 	docker compose logs -f
+
+test-api:
+	cd apps/api && go test ./...

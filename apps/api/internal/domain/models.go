@@ -11,10 +11,13 @@ const (
 )
 
 type Customer struct {
-	ID        string    `json:"id"`
-	Name      string    `json:"name"`
-	NPWP      string    `json:"npwp,omitempty"`
-	CreatedAt time.Time `json:"createdAt"`
+	ID        string     `json:"id"`
+	Name      string     `json:"name"`
+	NPWP      string     `json:"npwp,omitempty"`
+	CreatedBy string     `json:"createdBy"`
+	CreatedAt time.Time  `json:"createdAt"`
+	UpdatedAt time.Time  `json:"updatedAt"`
+	DeletedAt *time.Time `json:"deletedAt,omitempty"`
 }
 
 type Vehicle struct {
@@ -41,14 +44,28 @@ const (
 	ShipmentCancelled ShipmentStatus = "CANCELLED"
 )
 
+func ParseShipmentStatus(value string) (ShipmentStatus, bool) {
+	status := ShipmentStatus(value)
+	switch status {
+	case ShipmentDraft, ShipmentBooked, ShipmentInTransit, ShipmentDelivered, ShipmentCancelled:
+		return status, true
+	default:
+		return "", false
+	}
+}
+
 type Shipment struct {
-	ID         string         `json:"id"`
-	ResiNumber string         `json:"resiNumber"`
-	CustomerID string         `json:"customerId"`
-	Status     ShipmentStatus `json:"status"`
-	Origin     string         `json:"origin"`
-	Destination string        `json:"destination"`
-	CreatedAt  time.Time      `json:"createdAt"`
+	ID           string         `json:"id"`
+	ResiNumber   string         `json:"resiNumber"`
+	CustomerID   string         `json:"customerId"`
+	CustomerName string         `json:"customerName,omitempty"`
+	Status       ShipmentStatus `json:"status"`
+	Origin       string         `json:"origin"`
+	Destination  string         `json:"destination"`
+	CreatedBy    string         `json:"createdBy"`
+	CreatedAt    time.Time      `json:"createdAt"`
+	UpdatedAt    time.Time      `json:"updatedAt"`
+	DeletedAt    *time.Time     `json:"deletedAt,omitempty"`
 }
 
 type Assignment struct {
