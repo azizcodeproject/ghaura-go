@@ -1,0 +1,12 @@
+.env
+node_modules/
+.next/
+dist/
+bin/
+*.exe
+*.test
+coverage/
+.DS_Store
+.idea/
+.vscode/
+apps/api/tmp/
