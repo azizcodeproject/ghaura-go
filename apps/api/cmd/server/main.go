@@ -14,7 +14,10 @@ import (
 )
 
 func main() {
-	cfg := config.Load()
+	cfg, err := config.Load()
+	if err != nil {
+		log.Fatalf("config: %v", err)
+	}
 	if cfg.AppEnv != "local" {
 		gin.SetMode(gin.ReleaseMode)
 	}
@@ -29,13 +32,13 @@ func main() {
 		log.Fatalf("migrations: %v", err)
 	}
 
-	shipmentCache := cache.NewShipmentCache(cfg.RedisAddr)
+	shipmentCache := cache.NewShipmentCache(cfg.Redis.ClientOptions())
 	defer shipmentCache.Close()
 
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
 	defer cancel()
 	if err := shipmentCache.Ping(ctx); err != nil {
-		log.Printf("warning: redis belum siap di %s: %v", cfg.RedisAddr, err)
+		log.Printf("warning: redis belum siap di %s: %v", cfg.Redis.Addr, err)
 	}
 
 	apiHandler := handler.New(

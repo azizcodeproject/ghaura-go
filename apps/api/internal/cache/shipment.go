@@ -20,14 +20,20 @@ type ShipmentCache struct {
 	client *redis.Client
 }
 
-func NewShipmentCache(redisAddr string) *ShipmentCache {
-	client := redis.NewClient(&redis.Options{
-		Addr:         redisAddr,
-		DialTimeout:  2 * time.Second,
-		ReadTimeout:  2 * time.Second,
-		WriteTimeout: 2 * time.Second,
-	})
-	return &ShipmentCache{client: client}
+func NewShipmentCache(redisOpts *redis.Options) *ShipmentCache {
+	if redisOpts == nil {
+		redisOpts = &redis.Options{Addr: "localhost:6379"}
+	}
+	if redisOpts.DialTimeout == 0 {
+		redisOpts.DialTimeout = 2 * time.Second
+	}
+	if redisOpts.ReadTimeout == 0 {
+		redisOpts.ReadTimeout = 2 * time.Second
+	}
+	if redisOpts.WriteTimeout == 0 {
+		redisOpts.WriteTimeout = 2 * time.Second
+	}
+	return &ShipmentCache{client: redis.NewClient(redisOpts)}
 }
 
 func (c *ShipmentCache) Ping(ctx context.Context) error {
