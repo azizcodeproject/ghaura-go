@@ -35,6 +35,8 @@ docker compose up --build
 
 Panduan Sprint 1 (migrasi, cache Redis, contoh curl create customer → create shipment → get by resi): [docs/sprint-1.md](docs/sprint-1.md)
 
+Deploy produksi ke Railway (service `api` + `web` terpisah, plus Postgres/Redis; bukan `docker-compose` sebagai satu unit): [docs/railway.md](docs/railway.md)
+
 ## MVP roadmap
 
 1. Order + resi (Customer → Shipment)
