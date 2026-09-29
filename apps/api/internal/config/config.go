@@ -11,11 +11,12 @@ import (
 )
 
 type RedisConfig struct {
-	Addr     string
-	Username string
-	Password string
-	DB       int
-	UseTLS   bool
+	Addr      string
+	Username  string
+	Password  string
+	DB        int
+	UseTLS    bool
+	tlsConfig *tls.Config
 }
 
 type Config struct {
@@ -68,11 +69,12 @@ func parseRedisURL(rawURL string) (RedisConfig, error) {
 		return RedisConfig{}, fmt.Errorf("REDIS_URL: %w", err)
 	}
 	return RedisConfig{
-		Addr:     opts.Addr,
-		Username: opts.Username,
-		Password: opts.Password,
-		DB:       opts.DB,
-		UseTLS:   opts.TLSConfig != nil,
+		Addr:      opts.Addr,
+		Username:  opts.Username,
+		Password:  opts.Password,
+		DB:        opts.DB,
+		UseTLS:    opts.TLSConfig != nil,
+		tlsConfig: opts.TLSConfig,
 	}, nil
 }
 
@@ -85,8 +87,9 @@ func (r RedisConfig) ClientOptions() *redis.Options {
 		DialTimeout:  2 * time.Second,
 		ReadTimeout:  2 * time.Second,
 		WriteTimeout: 2 * time.Second,
+		TLSConfig:    r.tlsConfig,
 	}
-	if r.UseTLS {
+	if opts.TLSConfig == nil && r.UseTLS {
 		opts.TLSConfig = &tls.Config{MinVersion: tls.VersionTLS12}
 	}
 	return opts

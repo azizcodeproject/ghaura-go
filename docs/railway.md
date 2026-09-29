@@ -2,7 +2,7 @@
 
 Sprint 1 di-deploy sebagai **dua service aplikasi** (bukan `docker-compose` sebagai satu unit), plus plugin Postgres dan Redis. Kafka / Redpanda **tidak diperlukan**.
 
-`apps/api/railway.json` dan `apps/web/railway.json` mengunci builder ke Dockerfile yang sudah ada.
+Pakai Dockerfile yang sudah ada (`apps/api/Dockerfile`, `apps/web/Dockerfile`). File `railway.json` di tiap app hanya petunjuk builder/healthcheck — di dashboard tetap set **Root Directory** dan **Dockerfile**.
 
 ## 1. Buat project dari GitHub
 
@@ -21,12 +21,13 @@ Tidak perlu menambah Kafka / Redpanda untuk Sprint 1.
 
 ## 3. Service `api` — root `apps/api`
 
-Tambah service dari repo yang sama, lalu set:
+Tambah service dari repo yang sama, lalu set di dashboard:
 
 | Setting | Nilai |
 |---------|--------|
 | Root Directory | `apps/api` |
-| Builder | Dockerfile (`apps/api/Dockerfile`) |
+| Builder / Dockerfile | `Dockerfile` (path relatif ke root directory) |
+| Healthcheck path (opsional) | `/health` |
 
 Railway akan meng-inject `PORT`. API memakai urutan: `PORT` → `HTTP_ADDR` → `:8080`.
 
@@ -54,17 +55,17 @@ Tambah service kedua dari repo yang sama:
 | Setting | Nilai |
 |---------|--------|
 | Root Directory | `apps/web` |
-| Builder | Dockerfile (`apps/web/Dockerfile`) |
+| Builder / Dockerfile | `Dockerfile` |
 
-`NEXT_PUBLIC_API_URL` di-inline saat **build**. Set sebelum build/deploy web, lalu redeploy web jika URL API berubah.
+`NEXT_PUBLIC_API_URL` di-inline saat **`next build`**. Dockerfile web menerima nilai itu sebagai `ARG` (default lokal `http://localhost:8080`). Di Railway, set variabel service **dan pastikan tersedia saat build**, lalu redeploy web jika URL API berubah.
 
 ### Variabel service `web`
 
 | Variabel | Wajib | Catatan |
 |----------|-------|---------|
-| `NEXT_PUBLIC_API_URL` | Ya | URL publik API, contoh `https://ghaura-api.up.railway.app` (tanpa slash di akhir) |
+| `NEXT_PUBLIC_API_URL` | Ya | URL publik API, tanpa slash di akhir. Contoh: `https://ghaura-api.up.railway.app` atau `https://${{api.RAILWAY_PUBLIC_DOMAIN}}` |
 
-Railway meng-inject `PORT` untuk proses Next.js standalone. Dockerfile web bind ke `0.0.0.0`.
+Railway meng-inject `PORT` untuk proses Next.js standalone. Container bind ke `0.0.0.0` lewat start command Dockerfile.
 
 Generate **public domain** untuk `web`. Browser memanggil API lewat `NEXT_PUBLIC_API_URL`, jadi domain API harus publik.
 
@@ -73,8 +74,8 @@ Generate **public domain** untuk `web`. Browser memanggil API lewat `NEXT_PUBLIC
 1. Postgres + Redis siap.
 2. Deploy `api` dengan `DATABASE_URL` dan `REDIS_URL`.
 3. Cek `https://<api-domain>/health`.
-4. Set `NEXT_PUBLIC_API_URL` di `web` ke URL publik API.
-5. Deploy / redeploy `web`.
+4. Generate domain publik API, lalu set `NEXT_PUBLIC_API_URL` di `web`.
+5. Deploy / redeploy `web` (build ulang supaya Next.js meng-inline URL API).
 6. Buka domain web → `/shipments`.
 
 ## 6. Kafka
